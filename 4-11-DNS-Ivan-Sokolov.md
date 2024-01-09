@@ -41,10 +41,65 @@
 2. В программе VirtualBox загрузите операционную систему Linux (дистрибутив на ваш выбор: Deb-дистрибутив или CentOS), если она у вас не установлена в качестве основной системы.
 3. Установите DNS-сервер:
     *sudo apt install bind9*
-4. Проверьте его работу любым запросом на localhost-адрес. И добавьте в файервол разрешающее правило. 
+4. Проверьте его работу любым запросом на localhost-адрес.
+   ```
+   dig ya.ru @localhost
+   ```
+   И добавьте в файервол разрешающее правило.   
+   ```
+   sudo iptables -A INPUT -p udp --dport 53 -j ACCEPT
+   sudo iptables -A INPUT -p tcp --dport 53 -j ACCEPT
+   sudo iptables-save > /etc/iptables/rules.v4
+   ``` 
 5. Настройте кэширующий DNS сервер BIND.
+   *редактируем файл /etc/bind/named.conf.options*
+   ```
+   options {
+   directory "/var/cache/bind";
+
+   forwarders {
+	   8.8.8.8;
+	   8.8.4.4;
+   };
+
+   listen-on {
+	   127.0.0.1;
+	   192.168.123.1;
+   };
+	listen-on-v6 { 
+	none;
+   };
+   };
+   ```
 6. Сделайте так, чтобы можно было отправить запрос на преобразование адреса netology.ru.
-7. С помощью утилиты dnstop посмотрите какие входящие и исходящие запросы обрабатывались DNS-сервером.
+
+   *создаём директорию для зон /etc/bind/zones
+   выдаём права `sudo chown -R bind:bind /etc/bind/zones`
+   и вносим запись зоны в файле /etc/bind/named.conf.local*
+   ```
+   zone "netology.ru" {
+      type master;
+      file "/etc/bind/zones/db.netology.ru";
+   };
+   ```
+   *создаём файл зоны домена netology.ru /etc/bind/zones/db.netology.ru" и вносим туда запись для netology.ru (как шаблон можно использовать /etc/bind/db.local)*
+   ```
+   $TTL    604800
+   @   IN      SOA     dns.netology.ru. admin.netology.ru. (
+                              2         ; Serial
+                         604800         ; Refresh
+                          86400         ; Retry
+                        2419200         ; Expire
+                         604800 )       ; Negative Cache TTL
+   ;
+       IN      NS      dns.netology.ru
+   dns.netology.ru IN      A       192.168.123.1
+   ```
+   *проверяем созданную зону с помощью `named-checkzone netology.ru /etc/bind/zones/db.netology.ru` и перезапускаем сервис `systemctl restart bind9`* 
+      
+8. С помощью утилиты dnstop посмотрите какие входящие и исходящие запросы обрабатывались DNS-сервером.
+   ![image](https://github.com/juicyducks/netology---Ivan-Sokolov/assets/142479225/841010bb-5063-4192-be89-9fd340a9d94f)
+
 
 ### Задание 2.
 
@@ -59,10 +114,43 @@
 #### Процесс выполнения
 1. Запустите программу VirtualBox.
 2. В программе VirtualBox загрузите вторую виртуальную машину с  операционной системой Linux (дистрибутив на ваш выбор: Deb-дистрибутив или CentOS). 
-3. В настройках DNS-сервера укажите сеть второй виртуальной машины, которую будет обслуживать DNS-сервер. И создайте для второй виртуальной машины A-запись. 
-4. Выполните перезапуск DNS службы. 
-5. Сделайте скриншот результата запроса по доменному имени ко второй виртуальной машине. 
-6. Со второй машины выполните обращение к любому ресурсу в Интернете так, чтобы запрос проходил через наш DNS-сервер на первой виртуальной машине. Сделайте скриншот.
+3. В настройках DNS-сервера укажите сеть второй виртуальной машины, которую будет обслуживать DNS-сервер.
+
+   *добавляем запись для новой зоны в /etc/bind/named.conf.local*
+   ```
+   zone "testhost" {
+        type master;
+        file "/etc/bind/zones/db.testhost";
+   };
+   ```
+   И создайте для второй виртуальной машины A-запись.
+   
+   *создаём файл зоны для testhost /etc/bind/zones/db.testhost" и вносим туда запись для vm2 192.168.123.33*
+   ```
+   $TTL    604800
+   @       IN      SOA     dns.testhost. admin.testhost. (
+                              4         ; Serial
+                         604800         ; Refresh
+                          86400         ; Retry
+                        2419200         ; Expire
+                         604800 )       ; Negative Cache TTL
+   ;
+   @       IN      NS      dns.testhost
+   dns.testhost    IN      A       192.168.123.1
+   vm2     IN      A       192.168.123.33
+   ``` 
+
+4. Выполните перезапуск DNS службы.
+      
+5. Сделайте скриншот результата запроса по доменному имени ко второй виртуальной машине.
+
+   ![image](https://github.com/juicyducks/netology---Ivan-Sokolov/assets/142479225/d9a1a32e-32a2-4864-8e78-2d1122488ae9)
+
+7. Со второй машины выполните обращение к любому ресурсу в Интернете так, чтобы запрос проходил через наш DNS-сервер на первой виртуальной машине. Сделайте скриншот.
+
+   ![image](https://github.com/juicyducks/netology---Ivan-Sokolov/assets/142479225/c3573110-1dee-463e-aa2c-bd87dba81026)
+
+
 
 ### Правила приема работы
 - В личном кабинете отправлена ссылка на ваш Google документ, в котором прописан код каждого скрипта и скриншоты, демонстрирующие корректную работу скрипта.
