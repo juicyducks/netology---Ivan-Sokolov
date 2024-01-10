@@ -108,9 +108,72 @@ location / {
 #### Процесс выполнения
 1. Запустите программу VirtualBox
 2. В программе VirtualBox загрузите вторую виртуальную машину с  операционной системой Ubuntu. 
-3. Используя документацию [https://httpd.apache.org/docs/current/](https://httpd.apache.org/docs/current/), установите apache2 веб-сервер. 
+3. Используя документацию [https://httpd.apache.org/docs/current/](), установите apache2 веб-сервер. 
+
+    ```
+    sudo apt install apache2
+    sudo systemctl start apache2
+    ```
+
+    ![image](https://github.com/juicyducks/netology---Ivan-Sokolov/assets/142479225/8ba2697a-fe5c-4682-8062-0f8369234a56)
+    
 4. Выполните аналогичные действия как и задании 1, добившись аналогичной работы сервера.
 
+    *создаём сертификат* `sudo openssl rea -x509 -nodes -newkey rsa:4096 - keyout /etc/apache2/apa_cert.key - out /etc/apache2.apa_cert.pem - days 365`
+    *заменяем содержимое /var/www/html/index.html текстом `<h1>IT'S ALIVE</h1>`*
+    *создаём конфиг файл /etc/apache2/sites-available/localhost-ssl.conf*
+
+    ```
+    <VirtualHost *:443>
+        ServerAdmin webmaster@localhost
+        ServerName localhost
+
+        DocumentRoot /var/www/html
+
+        SSLEngine on
+        SSLCertificateFile /etc/apache2/apa_cert.pem
+        SSLCertificateKeyFile /etc/apache2/apa_cert.key
+
+        ErrorLog ${APACHE_LOG_DIR}/error.log
+        CustomLog ${APACHE_LOG_DIR}/access.log combined
+    </VirtualHost>
+    ```
+
+    *Активируем виртуальный хост, модуль ssl и перезапускаем сервис*
+
+    ```
+    sudo a2ensite localhost-ssl
+    sudo a2enmode ssl
+    sudo systemctl restart apache2
+    ```
+
+    ![image](https://github.com/juicyducks/netology---Ivan-Sokolov/assets/142479225/7a6547c5-f487-4b9e-a6c1-38a5a5297361)
+
+    *Для перенаправления на netology.ru правим /etc/apache2/sites-available/localhost-ssl.conf*
+
+   ```
+   <VirtualHost *:80>
+        ServerName localhost
+        Redirect permanent / https://netology.ru/
+    </VirtualHost>
+
+    <VirtualHost *:443>
+        ServerName localhost
+        Redirect permanent / https://netology.ru/
+
+        SSLEngine on
+        SSLCertificateFile /etc/apache2/apa_cert.pem
+        SSLCertificateKeyFile /etc/apache2/apa_cert.key   
+    </VirtualHost>
+   ```
+
+    *перезапускаем Apache и отправляем запросы с помощью curl*
+
+    ![image](https://github.com/juicyducks/netology---Ivan-Sokolov/assets/142479225/93fb8404-fe2a-4eb1-8f56-33866bf81d7a)
+   
+
+
+    
 ### Правила приема работы
 1. В личном кабинете отправлена ссылка на ваш Google документ, в котором прописан код каждого скрипта и скриншоты, демонстрирующие корректную работу скрипта
 2. В документе настроены права доступа “Просматривать могут все в Интернете, у кого есть ссылка”
