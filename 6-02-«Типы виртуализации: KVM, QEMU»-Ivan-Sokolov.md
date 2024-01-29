@@ -43,12 +43,31 @@
 
 Выполните действия и приложите скриншоты по каждому этапу:
 
-1. Установите KVM и библиотеку libvirt.  
-2. Создайте виртуальную машину. 
+1. Установите KVM и библиотеку libvirt.
+
+   ```
+   sudo apt install qemu-kvm libvirt-daemon-system libvirt-clients virtinst
+   ```
+  
+2. Создайте виртуальную машину.
+
+   ```
+   #!/bin/bash
+
+   virt-install \
+   --virt-type kvm \
+   --name kvm_tst \
+   --os-variant alpinelinux3.18 \
+   --memory 2048 \
+   --location /var/alpine-standard-3.18.0-x86_64.iso \
+   --disk path=/var/kvm_tst.qcow,size=20
+   ```   
+   
 3. Установите виртуальную машину. 
 Можете использовать пример [по ссылке](https://dl-cdn.alpinelinux.org/alpine/v3.13/releases/x86/alpine-standard-3.13.5-x86.iso). Пример взят [с сайта](https://alpinelinux.org). 
 
 В случае использования `virt-install` используйте параметр `--virt-type=kvm`.
+    ![image](https://github.com/juicyducks/netology---Ivan-Sokolov/assets/142479225/aec876d7-128e-424e-8bf3-24d4059fef49)
 
 
 
@@ -56,7 +75,7 @@
 
 Напишите, как изменилось время установки и старта системы при аппаратной виртуализации (KVM) по сравнению с программной эмуляцией (QEMU).
 
-
+*При использовании KVM установка и загрузка гораздо быстрее.*
 
 ---
 
