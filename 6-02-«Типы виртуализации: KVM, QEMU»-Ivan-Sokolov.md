@@ -28,9 +28,17 @@
 Выполните действия и приложите скриншоты по каждому этапу:
 
 1. Установите QEMU в зависимости от системы.
+
+   ```
+   sudo apt install qemu-system
+   ```
+   
 2. Создайте виртуальную машину.
 3. Установите виртуальную машину.
-Можете использовать пример [по ссылке](https://dl-cdn.alpinelinux.org/alpine/v3.13/releases/x86/alpine-standard-3.13.5-x86.iso). Пример взят [с сайта](https://alpinelinux.org). 
+Можете использовать пример [по ссылке](https://dl-cdn.alpinelinux.org/alpine/v3.13/releases/x86/alpine-standard-3.13.5-x86.iso). Пример взят [с сайта](https://alpinelinux.org).
+
+![image](https://github.com/juicyducks/netology---Ivan-Sokolov/assets/142479225/cb1a7be7-b519-4d30-8e5c-53dee8e24a63)
+
 
 Если KVM уже установлен, создайте ВМ без использования аппаратной виртуализации.  
 В случае использования `virt-install` используйте параметр `--virt-type=qemu`.
