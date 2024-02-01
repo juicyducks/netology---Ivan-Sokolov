@@ -48,7 +48,15 @@
 ### Задание 2
 
 1. Найдите в Docker Hub образ Apache и запустите его на 80 порту вашей ВМ.
+
+   ```
+   docker pull httpd
+   docker run -d -p 80:80 --name apache2 httpd:latest
+   ```
+   
 2. Откройте страницу http://localhost и убедитесь, что видите приветвенную страницу Apache.
+
+   
 
 ### Задание 3
 
