@@ -55,10 +55,40 @@
    ```
    
 2. Откройте страницу http://localhost и убедитесь, что видите приветвенную страницу Apache.
+   ![image](https://github.com/juicyducks/netology---Ivan-Sokolov/assets/142479225/3b56ad43-974b-4437-967c-ca2caef276a7)
 
    
 
 ### Задание 3
 
 1. Создайте свой Docker образ с Apache и подмените стандартную страницу index.html на страницу, содержащую ваши ФИО.
+
+   *Для удобства создал /dock/projects/ для нового проекта создал там папку apache_new_index с файлами Dockerfile и new_index.html*
+
+    ```html
+    #sudo nano /dock/projects/apache_new_index/new_index.html
+    <h1>Sokolov Ivan Dmitrievich</h1>
+    ```
+
+    ```
+    #sudo nano /dock/projects/apache_new_index/Dockerfile
+    FROM httpd:latest
+    MAINTAINER Ivan Sokolov
+    COPY new_index.html /usr/local/apache2/htdocs/index.html
+    ```
+
+   ```
+   #Собираем образ, предварительно перейдя в папку, где лежит Dockerfile
+   docker build -t apache_new_index .
+   ```
+   
 2. Запустите ваш образ, откройте страницу http://localhost и убедитесь, что страница изменилась.
+
+   ```
+   docker run -d -p 80:80 apache_new_index
+   ```
+   ![image](https://github.com/juicyducks/netology---Ivan-Sokolov/assets/142479225/9970cb80-a579-415f-a556-d7ca34a65f72)
+
+   ![image](https://github.com/juicyducks/netology---Ivan-Sokolov/assets/142479225/4e4ec0c6-1ade-4bdc-85c0-ed6447e75af5)
+
+
