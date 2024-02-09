@@ -75,6 +75,35 @@ networks:
 2. Добавьте необходимые тома с данными и конфигурацией (конфигурация лежит в репозитории в директории [6-04/prometheus](https://github.com/netology-code/sdvps-homeworks/tree/main/6-04/prometheus)).
 3. Обеспечьте внешний доступ к порту 9090 c докер-сервера.
 
+   ```
+   version: '3'
+
+   services:
+     prometheus:
+       image: prom/prometheus:v2.47.2
+       container_name: sokolov_id-netology-hw
+       command: --web.enable-lifecycle  --config.file=/etc/prometheus/prometheus.yml  #выполняется в контейнере
+       ports:
+         - 9090:9090
+       volumes:
+         - /prom:/etc/prometheus   #/папка_на_хосте:/папка_в_контейнере  
+         - prometheus-data:/sokolov_id-netology-hw
+       networks:
+          - sokolov_id-my-netology-hw
+       restart: always
+
+   volumes:
+     prometheus-data:
+
+   networks:
+     sokolov_id-my-netology-hw:
+       driver: bridge
+       ipam:
+         config:
+           - subnet: 10.5.0.0/16
+             gateway: 10.5.0.1
+   ```
+
 ---
 
 ### Задание 4 
@@ -83,6 +112,46 @@ networks:
 
 1. Создайте конфигурацию docker-compose для Pushgateway с именем контейнера <ваши фамилия и инициалы>-netology-pushgateway. 
 2. Обеспечьте внешний доступ к порту 9091 c докер-сервера.
+
+```
+version: '3'
+
+services:
+  prometheus:
+    image: prom/prometheus:v2.47.2
+    container_name: sokolov_id-netology-hw
+    command: --web.enable-lifecycle  --config.file=/etc/prometheus/prometheus.yml  #выполняется в контейнере
+    ports:
+      - 9090:9090
+    volumes:
+      - /prom:/etc/prometheus   #/папка_на_хосте:/папка_в_контейнере  
+      - prometheus-data:/sokolov_id-netology-hw
+    networks:
+       - sokolov_id-my-netology-hw
+    restart: always
+  pushgateway:
+    image: prom/pushgateway:v1.6.2
+    container_name: sokolov_id-netology-pushgateway
+    ports:
+      - 9091:9091
+    networks:
+      - sokolov_id-my-netology-hw
+    depends_on: #требование запущенного
+      - prometheus
+    restart: unless-stopped
+
+volumes:
+  prometheus-data:
+
+networks:
+  sokolov_id-my-netology-hw:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.5.0.0/16
+          gateway: 10.5.0.1
+```
+
 
 ---
 
@@ -95,6 +164,61 @@ networks:
 3. Добавьте переменную окружения с путем до файла с кастомными настройками (должен быть в томе), в самом файле пропишите логин=<ваши фамилия и инициалы> пароль=netology.
 4. Обеспечьте внешний доступ к порту 3000 c порта 80 докер-сервера.
 
+   version: '3'
+
+```
+services:
+  prometheus:
+    image: prom/prometheus:v2.47.2
+    container_name: sokolov_id-netology-hw
+    command: --web.enable-lifecycle  --config.file=/etc/prometheus/prometheus.yml  #выполняется в контейнере
+    ports:
+      - 9090:9090
+    volumes:
+      - /prom:/etc/prometheus   #/папка_на_хосте:/папка_в_контейнере  
+      - prometheus-data:/sokolov_id-netology-hw
+    networks:
+       - sokolov_id-my-netology-hw
+    restart: always
+  pushgateway:
+    image: prom/pushgateway:v1.6.2
+    container_name: sokolov_id-netology-pushgateway
+    ports:
+      - 9091:9091
+    networks:
+      - sokolov_id-my-netology-hw
+    depends_on: #требование запущенного
+      - prometheus
+    restart: unless-stopped
+   grafana:
+     image: grafana/grafana
+     container_name: sokolov_id-netology-grafana
+     environment:
+       GF_PATHS_CONFIG: /etc/grafana/custom.ini # на хосте лежит в /grafana/custom.ini
+     ports:
+       - 80:3000
+     volumes:
+       - /prom:/etc/grafana
+       - grafana-data:/var/lib/grafana
+     networks:
+       - sokolov_id-my-netology-hw
+     depends_on:
+       - prometheus
+     restart: unless-stopped
+
+
+volumes:
+  prometheus-data:
+  grafana-data:
+
+networks:
+  sokolov_id-my-netology-hw:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.5.0.0/16
+          gateway: 10.5.0.1
+```
 ---
 
 ### Задание 6 
@@ -104,7 +228,9 @@ networks:
 1. Настройте поочередность запуска контейнеров.
 2. Настройте режимы перезапуска для контейнеров.
 3. Настройте использование контейнерами одной сети.
-5. Запустите сценарий в detached режиме.
+4. Запустите сценарий в detached режиме.
+
+   *пункты 1-3 в конфиге выше, для задания 4 надо добавить ключ -d к команде запуска, я использовал `sudo docker-compose -f sokolov_id-netology-prometheus.yml up -d`*
 
 ---
 
