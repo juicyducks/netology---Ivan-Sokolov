@@ -302,6 +302,8 @@ networks:
 
 * скриншот графика, постоенного на основе вашей метрики.
 
+*При добавлении соединения, получаю следующую ошибку Post "http://sokolov_id-netology-prometheus:9090/api/v1/query": dial tcp: lookup sokolov_id-netology-prometheus on 127.0.0.11:53: server misbehaving - There was an error returned querying the Prometheus API.*
+
 ---
 
 ### Задание 8
