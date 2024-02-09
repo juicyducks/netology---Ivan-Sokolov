@@ -244,8 +244,62 @@ networks:
 
 В качестве решения приложите:
 
-* docker-compose.yml **целиком**;
+* docker-compose.yml **целиком**
+  ```YAML
+  services:
+  prometheus:
+    image: prom/prometheus:v2.47.2
+    container_name: sokolov_id-netology-hw
+    command: --web.enable-lifecycle  --config.file=/etc/prometheus/prometheus.yml  #выполняется в контейнере
+    ports:
+      - 9090:9090
+    volumes:
+      - /prom:/etc/prometheus   #/папка_на_хосте:/папка_в_контейнере  
+      - prometheus-data:/sokolov_id-netology-hw
+    networks:
+       - sokolov_id-my-netology-hw
+    restart: always
+  pushgateway:
+    image: prom/pushgateway:v1.6.2
+    container_name: sokolov_id-netology-pushgateway
+    ports:
+      - 9091:9091
+    networks:
+      - sokolov_id-my-netology-hw
+    depends_on: #требование запущенного
+      - prometheus
+    restart: unless-stopped
+   grafana:
+     image: grafana/grafana
+     container_name: sokolov_id-netology-grafana
+     environment:
+       GF_PATHS_CONFIG: /etc/grafana/custom.ini # на хосте лежит в /grafana/custom.ini
+     ports:
+       - 80:3000
+     volumes:
+       - /prom:/etc/grafana
+       - grafana-data:/var/lib/grafana
+     networks:
+       - sokolov_id-my-netology-hw
+     depends_on:
+       - prometheus
+     restart: unless-stopped
+
+   volumes:
+     prometheus-data:
+     grafana-data:
+
+   networks:
+     sokolov_id-my-netology-hw:
+       driver: bridge
+       ipam:
+         config:
+           - subnet: 10.5.0.0/16
+             gateway: 10.5.0.1
+   ```
 * скриншот команды docker ps после запуске docker-compose.yml;
+![image](https://github.com/juicyducks/netology---Ivan-Sokolov/assets/142479225/470c8140-5f53-4ef2-91f4-1d0716a82f87)
+
 * скриншот графика, постоенного на основе вашей метрики.
 
 ---
@@ -255,6 +309,11 @@ networks:
 **Выполните действия:** 
 
 1. Остановите и удалите все контейнеры одной командой.
+
+`docker stop $(docker ps -aq) && docker rm $(docker ps -aq)`
+
+![image](https://github.com/juicyducks/netology---Ivan-Sokolov/assets/142479225/aa12c47e-919f-497a-a207-a33d05f3b31d)
+
 
 В качестве решения приложите скриншот консоли с проделанными действиями.
 
