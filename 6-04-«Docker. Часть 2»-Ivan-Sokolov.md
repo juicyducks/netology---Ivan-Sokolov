@@ -237,10 +237,14 @@ networks:
 ### Задание 7 
 
 **Выполните действия.**
-1. Выполните запрос в Pushgateway для помещения метрики <ваши фамилия и инициалы> со значением 5 в Prometheus: ```echo "<ваши фамилия и инициалы> 5" | curl --data-binary @- http://localhost:<внешний порт выбранный вами в пункте 2>/metrics/job/netology```.
+1. Выполните запрос в Pushgateway для помещения метрики <ваши фамилия и инициалы> со значением 5 в Prometheus: ```echo "<ваши фамилия и инициалы> 5" | curl --data-binary @- http://localhost:<внешний порт pushgateway>/metrics/job/netology```.
+```
+echo "sokolov_id 5" | curl --data-binary @- http://localhost:9091/metrics/job/netology
+```
+
 2. Залогиньтесь в Grafana с помощью логина и пароля из предыдущего задания.
-3. Cоздайте Data Source Prometheus (Home -> Connections -> Data sources -> Add data source -> Prometheus -> указать "Prometheus server URL = http://<ваши фамилия и инициалы>-netology-prometheus:9090" -> Save & Test).
-4. Создайте график на основе добавленной в пункте 5 метрики (Build a dashboard -> Add visualization -> Prometheus -> Select metric -> Metric explorer -> <ваши фамилия и инициалы -> Apply.
+3. Cоздайте Data Source Prometheus (Home -> Connections -> Data sources -> Add data source -> Prometheus -> указать "Prometheus server URL = http://<имя сервиса prometheus, указанное в конфиге docker compose>:9090" -> Save & Test).
+4. Создайте график на основе добавленной в пункте 5 метрики (Build a dashboard -> Add visualization -> Prometheus -> Select metric -> Metric explorer -> <ваши фамилия и инициалы -> Select.
 
 В качестве решения приложите:
 
@@ -302,7 +306,7 @@ networks:
 
 * скриншот графика, постоенного на основе вашей метрики.
 
-*При добавлении соединения, получаю следующую ошибку Post "http://sokolov_id-netology-prometheus:9090/api/v1/query": dial tcp: lookup sokolov_id-netology-prometheus on 127.0.0.11:53: server misbehaving - There was an error returned querying the Prometheus API.*
+  ![image](https://github.com/juicyducks/netology---Ivan-Sokolov/assets/142479225/2cf2cd5b-2824-48d5-8a31-87a2754a8493)
 
 ---
 
